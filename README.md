@@ -12,5 +12,5 @@ It's commonly used for status indicator lights.
  
 ## Status
 
-- [ ] Builds 
+- [x] Builds 
 - [ ] Tested with hardware device ([Holybro M8N GNSS pod](http://www.holybro.com/product/pixhawk-4-gps-module/))
