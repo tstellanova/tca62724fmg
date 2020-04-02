@@ -41,8 +41,9 @@ impl<I2C, CommE> TCA62724FMG<I2C>
     }
 
     pub fn reset(&mut self) -> Result<(), Error<CommE>> {
-        // Turn off the LED current
-        self.set_enable(false)
+        self.get_enabled()?;
+        self.set_enable(false)?;
+        self.set_white_brightness(BRIGHTNESS_OFF)
     }
 
     /// Set white light brightness
@@ -55,16 +56,16 @@ impl<I2C, CommE> TCA62724FMG<I2C>
     pub fn set_enable(&mut self, enable: bool) -> Result<(), Error<CommE>>  {
         let settings =
             if enable {
-                SET_ENABLE | SET_POWERSAVE_OFF
+                BIT_SHDN | BIT_ENABLE
             }
             else {
-                SET_POWERSAVE_OFF
+                0
             };
 
-        self.write_sub_address(SUBADDR_SETTINGS, settings)
+        self.write_sub_address(SUBADDR_NAA_SETTINGS, settings)
     }
 
-    fn write_sub_address(&mut self, subaddr: u8, val: u8)  -> Result<(), Error<CommE>> {
+    pub fn write_sub_address(&mut self, subaddr: u8, val: u8)  -> Result<(), Error<CommE>> {
         let write_buf = [subaddr, val];
         self.i2c_port
             .write(self.address, &write_buf)
@@ -78,9 +79,10 @@ impl<I2C, CommE> TCA62724FMG<I2C>
         -> Result<(), Error<CommE>> {
 
         let write_buf = [
-            SUBADDR_PWM0, blue & BRIGHTNESS_MAX,
-            SUBADDR_PWM1, green & BRIGHTNESS_MAX,
-            SUBADDR_PWM2, red & BRIGHTNESS_MAX,
+            SUBADDR_AA_PWM0,
+            blue & BRIGHTNESS_MAX,
+            green & BRIGHTNESS_MAX,
+            red & BRIGHTNESS_MAX,
         ];
 
         self.i2c_port
@@ -88,22 +90,41 @@ impl<I2C, CommE> TCA62724FMG<I2C>
             .map_err(Error::Comm)?;
         Ok(())
     }
+
+    pub fn get_enabled(&mut self) -> Result<bool, Error<CommE>> {
+        let mut read_buf = [0u8; 2];
+        self.i2c_port
+            .read(self.address, &mut read_buf)
+            .map_err(Error::Comm)?;
+
+        let enabled =  (read_buf[0] &  (BIT_ENABLE | BIT_SHDN)) == (BIT_ENABLE | BIT_SHDN);
+        Ok(enabled)
+    }
 }
 
 const DEFAULT_I2C_ADDRESS: u8 = 0x55;
 
+
+/// Blue PWM auto-increment subaddress
+const SUBADDR_AA_PWM0: u8 = 0x01;
+/// Green PWM auto-increment subaddress
+const SUBADDR_AA_PWM1: u8 = 0x02;
+/// Red PWM auto-increment subaddress
+const SUBADDR_AA_PWM2: u8 = 0x03;
+
+const AUTO_INCREMENT_OFF: u8 = 0x80;
+// Note that these sub-addresses have 0x80 added to them, which turns off auto-increment
+// When the AI flag is set high, auto-increment is OFF; when it is set low, auto-increment is ON.
 /// Blue PWM
-const SUBADDR_PWM0 : u8 = 0x81;
-/// Green PWM
-const SUBADDR_PWM1 : u8 = 0x82;
-/// Red PWM
-const SUBADDR_PWM2 : u8 = 0x83;
-/// Settings configuration
-const SUBADDR_SETTINGS : u8 = 0x84;
+const SUBADDR_PWM0 : u8 = (SUBADDR_AA_PWM0 | AUTO_INCREMENT_OFF);
+// Green PWM
+//const SUBADDR_PWM1 : u8 = (SUBADDR_AA_PWM1 | AUTO_INCREMENT_OFF);
+// Red PWM
+//const SUBADDR_PWM2 : u8 = (SUBADDR_AA_PWM2 | AUTO_INCREMENT_OFF);
 
+/// Settings configuration: ENABLE/SHDN
+const SUBADDR_NAA_SETTINGS : u8 = (0x04 | AUTO_INCREMENT_OFF);
 
-const SET_POWERSAVE_OFF: u8 = 0x01;
-const SET_ENABLE: u8 = 0x02;
 
 /// Constants for brightness
 pub const BRIGHTNESS_MAX: u8 = 0x0f;
@@ -111,4 +132,11 @@ pub const BRIGHTNESS_HALF: u8 = 0x07;
 pub const BRIGHTNESS_LOW: u8 = 0x0f;
 pub const BRIGHTNESS_OFF: u8 = 0x00;
 
+const SET_POWERSAVE_OFF: u8 = 0x01;
+const SET_ENABLE: u8 = 0x02;
 
+/// SHDN setting: H: Output blinks at PWM0, PWM1, and PWM2 rate L: Power-saving mode
+const BIT_SHDN: u8 = (1 << 0);
+
+/// ENABLE setting: H: Output blinks at PWM0, PWM1, and PWM2 rate L: Output is OFF
+const BIT_ENABLE: u8 = (1 << 1);
