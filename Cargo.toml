@@ -1,0 +1,23 @@
+[package]
+name = "tca62724fmg"
+version = "0.1.0"
+authors = ["Todd Stellanova <tstellanova@users.noreply.github.com>"]
+edition = "2018"
+description = "TCA62724FMG RGB LED driver for embedded hal"
+license = "BSD-3-Clause"
+repository = "https://github.com/tstellanova/tca62724fmg"
+categories = [
+    "embedded",
+    "hardware-support",
+    "no-std",
+]
+keywords = [
+    "embedded-hal-driver",
+    "TCA62724FMG",
+    "rgbled"
+]
+readme = "README.md"
+
+[dependencies]
+embedded-hal = { version = "0.2.3", features = ["unproven"] }
+
