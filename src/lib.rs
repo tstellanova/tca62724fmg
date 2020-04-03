@@ -107,19 +107,19 @@ const DEFAULT_I2C_ADDRESS: u8 = 0x55;
 
 /// Blue PWM auto-increment subaddress
 const SUBADDR_AA_PWM0: u8 = 0x01;
-/// Green PWM auto-increment subaddress
-const SUBADDR_AA_PWM1: u8 = 0x02;
-/// Red PWM auto-increment subaddress
-const SUBADDR_AA_PWM2: u8 = 0x03;
+// /// Green PWM auto-increment subaddress
+// const SUBADDR_AA_PWM1: u8 = 0x02;
+// /// Red PWM auto-increment subaddress
+// const SUBADDR_AA_PWM2: u8 = 0x03;
 
 const AUTO_INCREMENT_OFF: u8 = 0x80;
 // Note that these sub-addresses have 0x80 added to them, which turns off auto-increment
 // When the AI flag is set high, auto-increment is OFF; when it is set low, auto-increment is ON.
-/// Blue PWM
-const SUBADDR_PWM0 : u8 = (SUBADDR_AA_PWM0 | AUTO_INCREMENT_OFF);
-// Green PWM
+// /// Blue PWM
+//const SUBADDR_PWM0 : u8 = (SUBADDR_AA_PWM0 | AUTO_INCREMENT_OFF);
+// /// Green PWM
 //const SUBADDR_PWM1 : u8 = (SUBADDR_AA_PWM1 | AUTO_INCREMENT_OFF);
-// Red PWM
+// /// Red PWM
 //const SUBADDR_PWM2 : u8 = (SUBADDR_AA_PWM2 | AUTO_INCREMENT_OFF);
 
 /// Settings configuration: ENABLE/SHDN
@@ -131,9 +131,6 @@ pub const BRIGHTNESS_MAX: u8 = 0x0f;
 pub const BRIGHTNESS_HALF: u8 = 0x07;
 pub const BRIGHTNESS_LOW: u8 = 0x0f;
 pub const BRIGHTNESS_OFF: u8 = 0x00;
-
-const SET_POWERSAVE_OFF: u8 = 0x01;
-const SET_ENABLE: u8 = 0x02;
 
 /// SHDN setting: H: Output blinks at PWM0, PWM1, and PWM2 rate L: Power-saving mode
 const BIT_SHDN: u8 = (1 << 0);
