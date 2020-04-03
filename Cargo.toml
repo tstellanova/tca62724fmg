@@ -1,6 +1,6 @@
 [package]
 name = "tca62724fmg"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Todd Stellanova <tstellanova@users.noreply.github.com>"]
 edition = "2018"
 description = "TCA62724FMG RGB LED driver for embedded hal"

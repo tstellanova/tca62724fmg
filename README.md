@@ -18,6 +18,7 @@ BSD-3 : see LICENSE file.
 - [x] Tested with hardware device
 - [x] Supports setting color channels individually
 - [x] Supports setting white values (all color channels equal brightness)
+- [x] Supports toggling on and off light output
 
 ## Examples
 

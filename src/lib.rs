@@ -87,15 +87,27 @@ where
             .read(self.address, &mut read_buf)
             .map_err(Error::Comm)?;
 
-        let enabled = (read_buf[0] & (BIT_ENABLE | BIT_SHDN)) == (BIT_ENABLE | BIT_SHDN);
+        // on = ((result[0] >> 4) & SETTING_ENABLE);
+
+        let enabled = BIT_ENABLE == ((read_buf[0] >> 4) & BIT_ENABLE);
         Ok(enabled)
     }
 
     /// Enable or disable light output
     pub fn set_enabled(&mut self, enable: bool) -> Result<(), Error<CommE>> {
-        let settings = if enable { BIT_SHDN | BIT_ENABLE } else { 0 };
-
+        let settings = if enable {
+            BIT_SHDN | BIT_ENABLE
+        } else {
+            BIT_SHDN
+        };
         self.write_sub_address(SUBADDR_NAA_SETTINGS, settings)
+    }
+
+    /// Toggle enabled/disabled
+    /// This can be used to quickly blink or flash the light output.
+    pub fn toggle(&mut self) -> Result<(), Error<CommE>> {
+        let enabled = self.get_enabled()?;
+        self.set_enabled(!enabled)
     }
 
     /// Write a value to a sub-address on the device
